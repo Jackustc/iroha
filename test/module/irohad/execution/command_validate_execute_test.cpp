@@ -46,8 +46,8 @@ std::unique_ptr<shared_model::interface::Command> buildCommand(
 template <class T>
 std::shared_ptr<T> getConcreteCommand(
     const std::unique_ptr<shared_model::interface::Command> &command) {
-  return clone(boost::apply_visitor(
-      framework::SpecifiedVisitor<T>(), command->get()));
+  return clone(
+      boost::apply_visitor(framework::SpecifiedVisitor<T>(), command->get()));
 }
 
 class CommandValidateExecuteTest : public ::testing::Test {
@@ -1735,7 +1735,7 @@ class CreateRoleTest : public CommandValidateExecuteTest {
   void SetUp() override {
     CommandValidateExecuteTest::SetUp();
 
-    std::set<std::string> perm = {toString(Role::kCreateRole)};
+    shared_model::interface::RolePermissionSet perm = {Role::kCreateRole};
     role_permissions = {toString(Role::kCreateRole)};
 
     // TODO 2018-04-20 Alexey Chernyshov - IR-1276 - rework with CommandBuilder
@@ -1789,8 +1789,8 @@ TEST_F(CreateRoleTest, InvalidCaseWhenNoPermissions) {
  */
 TEST_F(CreateRoleTest, InvalidCaseWhenRoleSuperset) {
   // TODO 2018-04-20 Alexey Chernyshov - IR-1276 - rework with CommandBuilder
-  std::set<std::string> master_perms = {toString(Role::kAddPeer),
-                                        toString(Role::kAppendRole)};
+  shared_model::interface::RolePermissionSet master_perms = {Role::kAddPeer,
+                                                             Role::kAppendRole};
   command = buildCommand(
       TestTransactionBuilder().createRole(kMasterRole, master_perms));
 
